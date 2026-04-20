@@ -1798,66 +1798,77 @@
                 });
 
                 sSnaps.forEach(sd => {
-                    const session = sd.data();
-                    // Count only closed sessions in stats — an open session not yet attended
-                    // should not be treated as an absence in the attendance percentage.
-                    if (session.status !== 'closed') return;
-                    totalSessions++;
-                    const myAtt = session.attendance?.[auth.currentUser.uid];
-                    const exc = session.exceptions?.[auth.currentUser.uid];
+    const session = sd.data();
+    const myAtt = session.attendance?.[auth.currentUser.uid];
+    const exc = session.exceptions?.[auth.currentUser.uid];
 
-                    if (myAtt) {
-                        if (['on_time', 'late', 'excused'].includes(myAtt.status)) totalPresent++;
-                        if (myAtt.status === 'late') { totalLatesCount++; if (myAtt.minutes) totalLateMins += myAtt.minutes; }
-                    } else if (session.status === 'closed') { totalAbsences++; }
+    // 1. חישובי סטטיסטיקה - מתבצעים רק עבור מפגשים סגורים
+    if (session.status === 'closed') {
+        totalSessions++;
+        
+        if (myAtt) {
+            if (['on_time', 'late', 'excused'].includes(myAtt.status)) totalPresent++;
+            if (myAtt.status === 'late') { 
+                totalLatesCount++; 
+                if (myAtt.minutes) totalLateMins += myAtt.minutes; 
+            }
+        } else { 
+            // אם המפגש סגור ואין נתוני נוכחות - זו היעדרות
+            totalAbsences++; 
+        }
+    }
 
-                    if (session.status === "open" && !myAtt) {
-                        const expectedTxt = session.expectedStartTime ? ` | שעת התחלה: ${session.expectedStartTime}` : "";
-                        const card = document.createElement('div');
-                        card.style.cssText = 'margin-bottom:15px;padding:20px;';
-                        const title = document.createElement('strong');
-                        title.style.cssText = 'display:block;margin-bottom:10px;font-size:1.1rem;';
-                        title.textContent = `מפגש פתוח: ${gd.data().name}`;
-                        const info = document.createElement('p');
-                        info.style.cssText = 'margin-bottom:10px;font-weight:bold;';
-                        info.textContent = `מפגש מס' ${session.sessionNumber}${expectedTxt}`;
+    // 2. הצגת כרטיס דיווח - מתבצע רק עבור מפגשים פתוחים שהמשתמש טרם דיווח בהם
+    if (session.status === "open" && !myAtt) {
+        const expectedTxt = session.expectedStartTime ? ` | שעת התחלה: ${session.expectedStartTime}` : "";
+        const card = document.createElement('div');
+        card.style.cssText = 'margin-bottom:15px;padding:20px;';
+        
+        const title = document.createElement('strong');
+        title.style.cssText = 'display:block;margin-bottom:10px;font-size:1.1rem;';
+        title.textContent = `מפגש פתוח: ${gd.data().name}`;
+        
+        const info = document.createElement('p');
+        info.style.cssText = 'margin-bottom:10px;font-weight:bold;';
+        info.textContent = `מפגש מס' ${session.sessionNumber}${expectedTxt}`;
 
-                        if (exc && exc.type === 'manual_request') {
-                            card.className = 'card bg-absent-static';
-                            const waitBtn = document.createElement('button');
-                            waitBtn.disabled = true;
-                            waitBtn.style.cssText = 'background-color:var(--muted-gray);color:white;cursor:default;';
-                            waitBtn.textContent = 'בקשה חריגה בהמתנה ⏳';
-                            card.appendChild(title);
-                            card.appendChild(info);
-                            card.appendChild(waitBtn);
-                        } else {
-                            // Check if this session already has a pending offline record
-                            const pendingOffline = state.offlineQueue.find(q => q.gid === gd.id && q.sid === sd.id && q.uid === auth.currentUser.uid);
-                            if (pendingOffline) {
-                                card.className = 'card bg-absent-static';
-                                const pendingBtn = document.createElement('button');
-                                pendingBtn.disabled = true;
-                                pendingBtn.style.cssText = 'background-color:var(--warning-orange);color:white;cursor:default;';
-                                pendingBtn.textContent = '📴 נוכחות ממתינה לסנכרון...';
-                                card.appendChild(title);
-                                card.appendChild(info);
-                                card.appendChild(pendingBtn);
-                            } else {
-                                card.className = 'card bg-blink-warn';
-                                const btn = document.createElement('button');
-                                btn.textContent = 'דווח נוכחות 📍';
-                                const iLat = session.instructorLocation?.lat;
-                                const iLng = session.instructorLocation?.lng;
-                                btn.addEventListener('click', (e) => startAttendProcess(gd.id, sd.id, iLat, iLng, session.expectedStartTime, 0, e));
-                                card.appendChild(title);
-                                card.appendChild(info);
-                                card.appendChild(btn);
-                            }
-                        }
-                        alerts.appendChild(card);
-                    }
-                });
+        if (exc && exc.type === 'manual_request') {
+            card.className = 'card bg-absent-static';
+            const waitBtn = document.createElement('button');
+            waitBtn.disabled = true;
+            waitBtn.style.cssText = 'background-color:var(--muted-gray);color:white;cursor:default;';
+            waitBtn.textContent = 'בקשה חריגה בהמתנה ⏳';
+            card.appendChild(title);
+            card.appendChild(info);
+            card.appendChild(waitBtn);
+        } else {
+            // בדיקה אם קיים דיווח אופליין ממתין לסנכרון
+            const pendingOffline = state.offlineQueue.find(q => q.gid === gd.id && q.sid === sd.id && q.uid === auth.currentUser.uid);
+            if (pendingOffline) {
+                card.className = 'card bg-absent-static';
+                const pendingBtn = document.createElement('button');
+                pendingBtn.disabled = true;
+                pendingBtn.style.cssText = 'background-color:var(--warning-orange);color:white;cursor:default;';
+                pendingBtn.textContent = '📴 נוכחות ממתינה לסנכרון...';
+                card.appendChild(title);
+                card.appendChild(info);
+                card.appendChild(pendingBtn);
+            } else {
+                card.className = 'card bg-blink-warn';
+                const btn = document.createElement('button');
+                btn.textContent = 'דווח נוכחות 📍';
+                const iLat = session.instructorLocation?.lat;
+                const iLng = session.instructorLocation?.lng;
+                btn.addEventListener('click', (e) => startAttendProcess(gd.id, sd.id, iLat, iLng, session.expectedStartTime, 0, e));
+                card.appendChild(title);
+                card.appendChild(info);
+                card.appendChild(btn);
+            }
+        }
+        alerts.appendChild(card);
+    }
+});
+
 
                 const div = document.createElement('div');
                 div.className = "card clickable list-item";
