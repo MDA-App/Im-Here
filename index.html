@@ -7,7 +7,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#d32f2f">
+    <meta name="theme-color" content="#0f1923">
 
     <script>
         if ('serviceWorker' in navigator) {
@@ -19,116 +19,706 @@
         }
     </script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-red: #d32f2f; --dark-blue: #1e293b; --light-bg: #f8fafc;
-            --white: #ffffff; --success-green: #15803d; --warning-orange: #ea580c;
-            --danger-red: #b91c1c; --late-yellow: #ca8a04; --muted-gray: #64748b; --info-blue: #0369a1;
-            --card-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-            --border-color: #e2e8f0;
+            --primary-red: #e02020;
+            --primary-red-dark: #b91414;
+            --primary-red-glow: rgba(224, 32, 32, 0.15);
+            --dark-blue: #0f1923;
+            --navy: #1a2535;
+            --light-bg: #f4f6f9;
+            --surface: #ffffff;
+            --surface-2: #f9fafb;
+            --success-green: #0e9f59;
+            --warning-orange: #e8610a;
+            --danger-red: #c41414;
+            --late-yellow: #b8860b;
+            --muted-gray: #6b7280;
+            --info-blue: #0561a0;
+            --border-color: #e8ecf0;
+            --border-subtle: #f0f2f5;
+            --card-shadow: 0 2px 12px rgba(15, 25, 35, 0.06), 0 1px 3px rgba(15, 25, 35, 0.04);
+            --card-shadow-hover: 0 8px 32px rgba(15, 25, 35, 0.1), 0 2px 8px rgba(15, 25, 35, 0.06);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Heebo', sans-serif; }
-        body { background-color: var(--light-bg); color: #0f172a; display: flex; flex-direction: column; min-height: 100vh; padding-top: 76px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Heebo', sans-serif; -webkit-font-smoothing: antialiased; }
 
-        header { 
-            background-color: var(--white); color: var(--dark-blue); 
-            padding: 0 20px; display: flex; justify-content: space-between; align-items: center; 
-            position: fixed; top: 0; left: 0; right: 0; height: 65px; z-index: 10001; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-bottom: 1px solid var(--border-color);
+        body {
+            background-color: var(--light-bg);
+            background-image: radial-gradient(ellipse at 80% 0%, rgba(224,32,32,0.04) 0%, transparent 60%),
+                              radial-gradient(ellipse at 20% 100%, rgba(15,25,35,0.03) 0%, transparent 60%);
+            color: #111827;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding-top: 76px;
         }
 
-        main { flex: 1; padding: 15px; max-width: 800px; margin: 0 auto; width: 100%; }
+        /* ── HEADER ── */
+        header {
+            background-color: rgba(255,255,255,0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            color: var(--dark-blue);
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 65px;
+            z-index: 10001;
+            box-shadow: 0 1px 0 var(--border-color), 0 4px 20px rgba(0,0,0,0.04);
+        }
 
-        .card { background: var(--white); border-radius: 16px; padding: 24px; box-shadow: var(--card-shadow); border: 1px solid var(--border-color); margin-bottom: 24px; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        /* Brand wordmark in header */
+        header > div:last-child {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.2rem;
+            letter-spacing: -0.5px;
+            color: var(--dark-blue);
+        }
+        header > div:last-child::after {
+            content: '';
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: var(--primary-red);
+            border-radius: 50%;
+            margin-right: 3px;
+            vertical-align: middle;
+            margin-bottom: 2px;
+        }
+
+        main { flex: 1; padding: 20px 16px; max-width: 820px; margin: 0 auto; width: 100%; }
+
+        /* ── CARDS ── */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius-xl);
+            padding: 28px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+            transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s ease;
+        }
         .clickable { cursor: pointer; }
-        .clickable:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,0.08); border-color: #cbd5e1; }
+        .clickable:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--card-shadow-hover);
+            border-color: #dde2e8;
+        }
 
-        h2 { color: var(--dark-blue); margin-bottom: 20px; border-bottom: 3px solid var(--primary-red); display: inline-block; padding-bottom: 6px; font-weight: 700; }
-        h3 { color: var(--dark-blue); font-weight: 500; margin-bottom: 12px; }
-        
-        input, select, textarea { width: 100%; padding: 14px; border: 1px solid var(--border-color); border-radius: 10px; background-color: #f8fafc; font-size: 1rem; margin-bottom: 12px; transition: 0.2s; font-family: 'Heebo', sans-serif; }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary-red); background-color: var(--white); box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.1); }
-        
-        button { background-color: var(--primary-red); color: var(--white); border: none; padding: 14px; border-radius: 10px; cursor: pointer; width: 100%; font-size: 1rem; font-weight: 600; transition: all 0.2s; letter-spacing: 0.3px; font-family: 'Heebo', sans-serif; }
-        button:hover { background-color: #b71c1c; transform: translateY(-1px); }
-        button:disabled { background-color: #94a3b8 !important; cursor: not-allowed; transform: none; }
-        
-        button.secondary { background-color: var(--dark-blue); }
-        button.secondary:hover { background-color: #0f172a; }
-        button.outline { background: transparent; border: 1.5px solid var(--dark-blue); color: var(--dark-blue); }
-        button.outline:hover { background: #f1f5f9; }
+        /* ── TYPOGRAPHY ── */
+        h2 {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            color: var(--dark-blue);
+            margin-bottom: 22px;
+            font-size: 1.35rem;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        h2::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 22px;
+            background: linear-gradient(180deg, var(--primary-red), #ff6b6b);
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+        /* Override for centered h2 in auth */
+        h2[style*="text-align:center"], h2[style*="text-align: center"] {
+            justify-content: center;
+        }
+        h2[style*="text-align:center"]::before,
+        h2[style*="text-align: center"]::before {
+            display: none;
+        }
 
-        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--border-color); border-radius: 10px; margin-bottom: 6px; background: var(--white); }
-        .list-item:last-child { border-bottom: none; }
-        .status-tag { padding: 4px 10px; border-radius: 20px; font-size: 0.85rem; color: white; font-weight: 600; letter-spacing: 0.5px; }
-        
-        .bg-green { background: var(--success-green); color: white !important; }
-        .bg-red { background: var(--danger-red); color: white !important; }
-        .bg-yellow { background: var(--late-yellow); color: white !important; }
-        .bg-blue { background: var(--info-blue); color: white !important; }
-        .bg-purple { background: #7e22ce; color: white !important; }
-        
-        .text-green { color: var(--success-green); font-weight: bold; }
-        .text-orange { color: var(--warning-orange); font-weight: bold; }
-        .text-red { color: var(--danger-red); font-weight: bold; }
+        h3 {
+            color: var(--dark-blue);
+            font-weight: 600;
+            margin-bottom: 14px;
+            font-size: 1.05rem;
+        }
 
-        @keyframes blinker { 50% { opacity: 0.5; } }
-        @keyframes intenseBlinker { 0% { background-color: #fecdd3; transform: scale(1); } 50% { background-color: #f43f5e; color: white; transform: scale(1.02); } 100% { background-color: #fecdd3; transform: scale(1); } }
-        
-        .bg-blink-warn { background-color: #fff7ed; border: 1.5px solid var(--warning-orange); animation: blinker 1.5s linear infinite; }
-        .bg-blink-intense { border: 2px solid var(--danger-red); animation: intenseBlinker 1s infinite; cursor: pointer; }
-        .bg-absent-static { background-color: #f1f5f9; border-right: 4px solid var(--muted-gray); }
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 5px;
+            letter-spacing: 0.2px;
+        }
 
+        /* ── INPUTS ── */
+        input, select, textarea {
+            width: 100%;
+            padding: 13px 16px;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background-color: var(--surface-2);
+            font-size: 1rem;
+            margin-bottom: 14px;
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+            font-family: 'Heebo', sans-serif;
+            color: #111827;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-red);
+            background-color: var(--surface);
+            box-shadow: 0 0 0 4px var(--primary-red-glow);
+        }
+        input::placeholder, textarea::placeholder { color: #9ca3af; }
+
+        /* ── BUTTONS ── */
+        button {
+            background: linear-gradient(135deg, var(--primary-red) 0%, #c41818 100%);
+            color: #fff;
+            border: none;
+            padding: 13px 18px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+            letter-spacing: 0.2px;
+            font-family: 'Heebo', sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+        button::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(255,255,255,0);
+            transition: background 0.15s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(224,32,32,0.35);
+        }
+        button:hover::after { background: rgba(255,255,255,0.08); }
+        button:active { transform: translateY(0); box-shadow: none; }
+        button:disabled { background: linear-gradient(135deg, #9ca3af, #6b7280) !important; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+
+        button.secondary {
+            background: linear-gradient(135deg, #1e2d3d 0%, var(--dark-blue) 100%);
+        }
+        button.secondary:hover { box-shadow: 0 6px 20px rgba(15,25,35,0.3); }
+
+        button.outline {
+            background: transparent;
+            border: 1.5px solid #d1d5db;
+            color: #374151;
+            box-shadow: none;
+        }
+        button.outline:hover {
+            background: var(--surface-2);
+            border-color: #9ca3af;
+            box-shadow: none;
+            transform: translateY(-1px);
+        }
+
+        /* ── LIST ITEMS ── */
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            border-radius: var(--radius-md);
+            margin-bottom: 8px;
+            background: var(--surface);
+            border: 1px solid var(--border-subtle);
+            transition: all 0.18s ease;
+        }
+        .list-item:last-child { margin-bottom: 0; }
+        .list-item:hover { border-color: var(--border-color); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+
+        /* ── STATUS TAGS ── */
+        .status-tag {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: white;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .bg-green { background: linear-gradient(135deg, #059f59, #047a44); color: white !important; }
+        .bg-red { background: linear-gradient(135deg, #c41414, #a01010); color: white !important; }
+        .bg-yellow { background: linear-gradient(135deg, #b8860b, #8f6809); color: white !important; }
+        .bg-blue { background: linear-gradient(135deg, #0561a0, #044580); color: white !important; }
+        .bg-purple { background: linear-gradient(135deg, #6d28d9, #5b21b6); color: white !important; }
+
+        .text-green { color: var(--success-green); font-weight: 700; }
+        .text-orange { color: var(--warning-orange); font-weight: 700; }
+        .text-red { color: var(--danger-red); font-weight: 700; }
+
+        /* ── ANIMATIONS ── */
+        @keyframes blinker { 50% { opacity: 0.55; } }
+        @keyframes intenseBlinker {
+            0% { background-color: #fee2e2; transform: scale(1); }
+            50% { background-color: #ef4444; color: white; transform: scale(1.015); }
+            100% { background-color: #fee2e2; transform: scale(1); }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .bg-blink-warn {
+            background-color: #fffbeb;
+            border: 1.5px solid var(--warning-orange);
+            animation: blinker 1.5s ease-in-out infinite;
+        }
+        .bg-blink-intense {
+            border: 2px solid var(--danger-red);
+            animation: intenseBlinker 1s ease-in-out infinite;
+            cursor: pointer;
+        }
+        .bg-absent-static {
+            background-color: #f9fafb;
+            border-right: 3px solid #d1d5db;
+        }
+
+        /* ── UTILITIES ── */
         .hidden { display: none !important; }
-        .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.6); backdrop-filter: blur(3px); display:flex; align-items:center; justify-content:center; z-index:20000; padding: 20px; }
-        
-        .tab-container { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 2px solid var(--border-color); overflow-x: auto; }
-        .tab { padding: 12px 16px; cursor: pointer; border-bottom: 3px solid transparent; font-weight: 500; color: var(--muted-gray); transition: 0.2s; white-space: nowrap; }
-        .tab:hover { color: var(--dark-blue); }
-        .tab.active { border-bottom-color: var(--primary-red); color: var(--primary-red); font-weight: 700; }
 
+        /* ── MODAL ── */
+        .modal-overlay {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: rgba(10, 15, 25, 0.65);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 20000;
+            padding: 20px;
+            animation: fadeInUp 0.2s ease;
+        }
+        .modal-overlay > .card {
+            animation: fadeInUp 0.25s cubic-bezier(0.34,1.56,0.64,1);
+            border: 1px solid rgba(255,255,255,0.8);
+        }
+
+        /* ── TABS ── */
+        .tab-container {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 22px;
+            background: var(--surface-2);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 4px;
+            overflow-x: auto;
+        }
+        .tab {
+            padding: 9px 16px;
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--muted-gray);
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .tab:hover { color: var(--dark-blue); background: rgba(255,255,255,0.7); }
+        .tab.active {
+            background: var(--surface);
+            color: var(--primary-red);
+            font-weight: 700;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+        }
+
+        /* ── MISC ── */
         .small-date { font-size: 0.75rem; color: var(--muted-gray); display: block; margin-top: 4px; }
-        
-        .action-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
-        .action-btn-small { width: auto; padding: 8px 12px; font-size: 0.9rem; }
-        
-        .icon-btn { background: transparent; border: 1.5px solid var(--danger-red); border-radius: 6px; color: var(--danger-red); font-size: 0.95rem; cursor: pointer; padding: 4px 8px; width: auto; transition: 0.2s; opacity: 0.8; }
-        .icon-btn:hover { background: #fef2f2; opacity: 1; transform: scale(1.05); }
 
-        .profile-area { position: relative; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; padding: 8px; border-radius: 8px; transition: 0.2s; }
-        .profile-area:hover { background: #f1f5f9; }
-        .dropdown-menu { position: absolute; top: 55px; right: 0; left: auto; background: white; color: black; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-radius: 12px; border: 1px solid var(--border-color); display: none; width: 160px; z-index: 100; overflow: hidden; }
-        .dropdown-menu.show { display: block; animation: dropIn 0.2s ease forwards; }
-        @keyframes dropIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        .dropdown-item { padding: 14px 16px; border-bottom: 1px solid #f1f5f9; font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: 0.2s; }
-        .dropdown-item:hover { background: #f8fafc; padding-right: 20px; }
+        .action-row { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+        .action-btn-small {
+            width: auto;
+            padding: 9px 14px;
+            font-size: 0.88rem;
+            border-radius: var(--radius-sm);
+        }
 
-        #toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 99999; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px; }
-        .toast { padding: 14px 24px; border-radius: 30px; color: white; font-weight: bold; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.2); opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform: translateY(30px) scale(0.9); }
+        .icon-btn {
+            background: transparent;
+            border: 1.5px solid #fca5a5;
+            border-radius: var(--radius-sm);
+            color: var(--danger-red);
+            font-size: 0.9rem;
+            cursor: pointer;
+            padding: 5px 9px;
+            width: auto;
+            transition: all 0.18s ease;
+        }
+        .icon-btn:hover { background: #fef2f2; border-color: var(--danger-red); transform: scale(1.05); }
+
+        /* ── PROFILE / DROPDOWN ── */
+        .profile-area {
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 8px 12px;
+            border-radius: var(--radius-md);
+            transition: all 0.2s;
+            color: var(--dark-blue);
+        }
+        .profile-area:hover { background: var(--surface-2); }
+
+        /* Avatar circle */
+        .profile-area > span:first-child {
+            width: 34px;
+            height: 34px;
+            background: linear-gradient(135deg, #e8ecf0, #dde3eb);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            border: 1.5px solid var(--border-color);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            left: auto;
+            background: white;
+            color: black;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.06);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            display: none;
+            width: 180px;
+            z-index: 100;
+            overflow: hidden;
+        }
+        .dropdown-menu.show { display: block; animation: dropIn 0.2s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+        @keyframes dropIn {
+            from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .dropdown-item {
+            padding: 13px 18px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        .dropdown-item:last-child { border-bottom: none; }
+        .dropdown-item:hover { background: var(--surface-2); padding-right: 22px; }
+
+        /* ── TOASTS ── */
+        #toast-container {
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 92%;
+            max-width: 420px;
+            pointer-events: none;
+        }
+        .toast {
+            padding: 14px 22px;
+            border-radius: 14px;
+            color: white;
+            font-weight: 600;
+            font-size: 0.92rem;
+            text-align: center;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.2), 0 4px 8px rgba(0,0,0,0.1);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+            transform: translateY(24px) scale(0.92);
+            border: 1px solid rgba(255,255,255,0.15);
+            pointer-events: auto;
+        }
         .toast.show { opacity: 1; transform: translateY(0) scale(1); }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid var(--border-color); padding: 10px; text-align: right; }
-        th { background-color: #f1f5f9; }
 
-        /* ===== MODAL DIALOG (החלפת alert/confirm/prompt) ===== */
-        #app-dialog-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.6); backdrop-filter:blur(3px); display:flex; align-items:center; justify-content:center; z-index:30000; padding:20px; }
-        #app-dialog-box { background:white; border-radius:16px; padding:28px; width:100%; max-width:380px; box-shadow:0 20px 40px rgba(0,0,0,0.2); }
-        #app-dialog-title { font-size:1.1rem; font-weight:700; color:var(--dark-blue); margin-bottom:12px; }
-        #app-dialog-message { font-size:0.95rem; color:#475569; margin-bottom:20px; line-height:1.6; }
-        #app-dialog-input { width:100%; padding:12px; border:1px solid var(--border-color); border-radius:10px; font-size:1rem; margin-bottom:16px; font-family:'Heebo',sans-serif; display:none; }
-        #app-dialog-input:focus { outline:none; border-color:var(--primary-red); box-shadow:0 0 0 3px rgba(211,47,47,0.1); }
-        #app-dialog-actions { display:flex; gap:10px; }
+        /* ── TABLE ── */
+        table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 12px; }
+        th, td { padding: 11px 14px; text-align: right; }
+        th {
+            background: var(--surface-2);
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #374151;
+            letter-spacing: 0.3px;
+            border-bottom: 2px solid var(--border-color);
+        }
+        td { border-bottom: 1px solid var(--border-subtle); font-size: 0.93rem; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #fafbfc; }
+
+        /* ── APP DIALOG ── */
+        #app-dialog-overlay {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: rgba(10,15,25,0.65);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 30000;
+            padding: 20px;
+        }
+        #app-dialog-box {
+            background: white;
+            border-radius: var(--radius-xl);
+            padding: 32px;
+            width: 100%;
+            max-width: 390px;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.18), 0 8px 20px rgba(0,0,0,0.08);
+            border: 1px solid rgba(255,255,255,0.8);
+            animation: fadeInUp 0.25s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        #app-dialog-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--dark-blue);
+            margin-bottom: 10px;
+        }
+        #app-dialog-message {
+            font-size: 0.95rem;
+            color: #4b5563;
+            margin-bottom: 22px;
+            line-height: 1.65;
+        }
+        #app-dialog-input {
+            width: 100%;
+            padding: 13px 16px;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            margin-bottom: 18px;
+            font-family: 'Heebo', sans-serif;
+            display: none;
+            background: var(--surface-2);
+        }
+        #app-dialog-input:focus { outline: none; border-color: var(--primary-red); box-shadow: 0 0 0 4px var(--primary-red-glow); background: white; }
+        #app-dialog-actions { display: flex; gap: 10px; }
+
+        /* ── SPLASH SCREEN UPGRADE ── */
+        #splash-screen {
+            background: linear-gradient(135deg, #0f1923 0%, #1a2535 100%) !important;
+        }
+        #splash-screen h1 {
+            font-family: 'Syne', sans-serif !important;
+            font-size: 2.8rem !important;
+            font-weight: 800 !important;
+            background: linear-gradient(135deg, #ffffff 30%, #f87171) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            background-clip: text !important;
+            letter-spacing: -1px !important;
+            margin-bottom: 12px !important;
+        }
+        #splash-screen p {
+            color: rgba(255,255,255,0.55) !important;
+            font-size: 0.95rem !important;
+            letter-spacing: 0.5px !important;
+        }
+
+        /* ── FAB INSTALL ── */
+        #fab-install {
+            background: linear-gradient(135deg, var(--primary-red) 0%, #c41414 100%) !important;
+            border-radius: 16px !important;
+            padding: 14px 20px !important;
+            box-shadow: 0 8px 24px rgba(224,32,32,0.4) !important;
+            font-size: 0.88rem !important;
+            line-height: 1.4 !important;
+            text-align: right !important;
+        }
+
+        /* ── SECTION ANIMATION ── */
+        section, .card { animation: fadeInUp 0.3s ease both; }
+
+
+        /* ── AUTH CARD ── */
+        .auth-card {
+            max-width: 420px;
+            margin: 0 auto 20px;
+            padding: 36px 32px;
+        }
+        .auth-card h2 {
+            font-size: 1.5rem;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+        .auth-card h2::before { display: none; }
+
+        /* ── SEARCH WRAP ── */
+        .search-wrap { position: relative; margin-bottom: 16px; }
+        .search-wrap input { padding-right: 42px; margin-bottom: 0; }
+        .search-wrap::before {
+            content: '🔍';
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.9rem;
+            pointer-events: none;
+        }
+        /* ── SCROLLBAR ── */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+        /* ── AUTH SCREEN ── */
+        #view-auth {
+            max-width: 420px;
+            margin: 0 auto 20px;
+            padding: 36px 32px;
+        }
+
+        /* ── DISABLED INPUTS (profile view) ── */
+        input:disabled {
+            background: #f1f4f8;
+            color: #6b7280;
+            cursor: default;
+            border-color: #eaedf2;
+            opacity: 1;
+        }
+
+        /* ── PROGRESS BAR (attendance %) ── */
+        .attendance-bar-wrap {
+            height: 8px;
+            background: #eef0f4;
+            border-radius: 99px;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+        .attendance-bar-fill {
+            height: 100%;
+            border-radius: 99px;
+            transition: width 0.8s cubic-bezier(0.34,1,0.64,1);
+        }
+
+        /* ── EMPTY STATE ── */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--muted-gray);
+        }
+        .empty-state .empty-icon {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+            display: block;
+            opacity: 0.35;
+        }
+        .empty-state p { font-size: 0.95rem; color: #9ca3af; }
+
+        /* ── ACTIVE SESSION ALERT CARD ── */
+        .session-alert-card {
+            border-right: 4px solid var(--primary-red) !important;
+            background: linear-gradient(135deg, #fff5f5 0%, #ffffff 60%) !important;
+        }
+        .session-alert-card .attend-btn {
+            background: linear-gradient(135deg, var(--primary-red), #c41414);
+            font-size: 1.05rem;
+            padding: 15px;
+            border-radius: var(--radius-md);
+            box-shadow: 0 4px 16px rgba(224,32,32,0.3);
+        }
+
+        /* ── ADMIN STATS CARD ── */
+        .admin-stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 20px 16px;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .admin-stat-card:hover { transform: translateY(-3px); box-shadow: var(--card-shadow-hover); }
+        .admin-stat-card .stat-label {
+            font-size: 0.75rem;
+            color: var(--muted-gray);
+            font-weight: 600;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            display: block;
+        }
+        .admin-stat-card .stat-value {
+            font-family: 'Syne', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        /* ── NOTICE CARD ── */
+        .notice-card {
+            background: var(--surface-2);
+            border: 1px solid var(--border-subtle);
+            border-right: 3px solid var(--info-blue);
+            border-radius: var(--radius-md);
+            padding: 16px 18px;
+            margin-bottom: 10px;
+        }
+        .notice-card .notice-text { font-size: 0.95rem; line-height: 1.6; color: #1f2937; margin-bottom: 10px; }
+        .notice-card .notice-meta { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--muted-gray); }
+
+        /* ── LOADING TEXT ── */
+        .loading-text {
+            text-align: center;
+            color: var(--muted-gray);
+            padding: 24px;
+            font-size: 0.9rem;
+            animation: blinker 1.2s ease-in-out infinite;
+        }
+
+        /* ── MOBILE TOUCH ── */
+        @media (hover: none) {
+            .clickable:active { transform: scale(0.98); transition: transform 0.1s; }
+            button:active { transform: scale(0.97); opacity: 0.9; transition: transform 0.1s; }
+        }
+
+        /* ── SMALL SCREENS ── */
+        @media (max-width: 360px) {
+            main { padding: 12px 10px; }
+            .card { padding: 18px 16px; }
+            h2 { font-size: 1.15rem; }
+        }
+
     </style>
 </head>
 <body>
 
     <!-- Splash Screen -->
-    <div id="splash-screen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:var(--white);display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:99999;transition:opacity 0.5s;">
-        <h1 style="color:var(--primary-red);font-size:2.5rem;margin-bottom:10px;">.I'm here</h1>
-        <p style="color:var(--dark-blue);font-weight:500;">מערכת מתקדמת לניהול נוכחות...</p>
+    <div id="splash-screen" style="position:fixed;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:99999;transition:opacity 0.6s ease;gap:6px;">
+        <div style="width:56px;height:56px;background:linear-gradient(135deg,#e02020,#c41414);border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;box-shadow:0 12px 32px rgba(224,32,32,0.4);">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="white"/></svg>
+        </div>
+        <h1 style="font-family:'Syne',sans-serif;font-size:2.4rem;font-weight:800;color:white;letter-spacing:-1px;margin-bottom:6px;">I'm Here</h1>
+        <p style="color:rgba(255,255,255,0.45);font-size:0.88rem;letter-spacing:0.8px;">מערכת ניהול נוכחות</p>
     </div>
 
     <!-- FAB Install -->
@@ -152,7 +742,7 @@
 
     <main>
         <!-- AUTH -->
-        <section id="view-auth" class="card">
+        <section id="view-auth" class="card auth-card">
             <div id="login-section">
                 <h2 style="display:block;text-align:center;">התחברות מהירה</h2>
                 <form id="form-login">
@@ -200,7 +790,7 @@
                 <div class="tab" data-admin-tab="dashboard">סקירה מערכתית</div>
             </div>
             <div id="admin-tab-users">
-                <input type="text" id="admin-search-user" placeholder="חפש משתמש לפי שם או ת.ז">
+                <div class="search-wrap"><input type="text" id="admin-search-user" placeholder="חפש משתמש לפי שם או ת.ז"></div>
                 <div id="admin-users-list" style="max-height:400px;overflow-y:auto;"></div>
             </div>
             <div id="admin-tab-groups" class="hidden">
@@ -940,7 +1530,7 @@
 
         async function loadAdminUsers() {
             const list = document.getElementById('admin-users-list');
-            list.textContent = "טוען משתמשים...";
+            list.innerHTML = '<div class="loading-text">טוען משתמשים...</div>';
             const snaps = await getDocs(collection(db, "users"));
             state.adminUsersCache = snaps.docs.map(d => ({ id: d.id, ...d.data() }));
             renderAdminUsers(state.adminUsersCache);
@@ -998,7 +1588,7 @@
 
         async function loadAdminGroups() {
             const list = document.getElementById('admin-groups-list');
-            list.textContent = "טוען קבוצות...";
+            list.innerHTML = '<div class="loading-text">טוען קבוצות...</div>';
             const snaps = await getDocs(collection(db, "groups"));
             list.innerHTML = '';
             snaps.forEach(d => {
@@ -1029,7 +1619,7 @@
 
         async function loadAdminDashboard() {
             const cont = document.getElementById('admin-stats-container');
-            cont.textContent = "טוען נתונים...";
+            cont.innerHTML = '<div class="loading-text">טוען נתונים...</div>';
             const [usersSnap, groupsSnap] = await Promise.all([
                 getDocs(collection(db, "users")),
                 getDocs(collection(db, "groups"))
@@ -1049,16 +1639,12 @@
             ];
             stats.forEach(s => {
                 const div = document.createElement('div');
-                div.className = 'card';
-                div.style.cssText = 'text-align:center;padding:15px;';
-                const h3 = document.createElement('h3');
-                h3.style.margin = '0';
-                h3.textContent = `${s.icon} ${s.label}`;
-                const strong = document.createElement('strong');
-                strong.style.cssText = `font-size:1.5rem;color:${s.color};`;
-                strong.textContent = s.val;
-                div.appendChild(h3);
-                div.appendChild(strong);
+                div.className = 'admin-stat-card';
+                div.innerHTML = `
+                    <span style="font-size:1.6rem;display:block;margin-bottom:8px;">${s.icon}</span>
+                    <span class="stat-label">${s.label}</span>
+                    <span class="stat-value" style="color:${s.color};">${s.val}</span>
+                `;
                 cont.appendChild(div);
             });
         }
@@ -1135,7 +1721,7 @@
 
         async function loadInstructorMain() {
             const cont = document.getElementById('instructor-groups-container');
-            cont.textContent = "טוען...";
+            cont.innerHTML = '<div class="loading-text">טוען...</div>';
             const [q1, q2] = await Promise.all([
                 getDocs(query(collection(db, "groups"), where("instructorId", "==", auth.currentUser.uid))),
                 getDocs(query(collection(db, "groups"), where("coInstructors", "array-contains", auth.currentUser.uid)))
@@ -1144,7 +1730,7 @@
             q1.forEach(d => groupsMap.set(d.id, d));
             q2.forEach(d => groupsMap.set(d.id, d));
             cont.innerHTML = '';
-            if (groupsMap.size === 0) { cont.textContent = "אין קבוצות בניהולך"; return; }
+            if (groupsMap.size === 0) { cont.innerHTML = '<div class="empty-state"><span class="empty-icon">📋</span><p>אין קבוצות בניהולך עדיין</p></div>'; return; }
             groupsMap.forEach(d => {
                 const div = document.createElement('div');
                 div.className = "card clickable list-item";
@@ -1152,9 +1738,13 @@
                 const info = document.createElement('div');
                 info.style.flex = '1';
                 const h3 = document.createElement('h3');
-                h3.style.cssText = 'margin:0;font-size:1.2rem;';
+                h3.style.cssText = 'margin:0;font-size:1.1rem;';
                 h3.textContent = d.data().name;
+                const memberCount = document.createElement('span');
+                memberCount.style.cssText = 'font-size:0.8rem;color:var(--muted-gray);font-weight:500;display:block;margin-top:3px;';
+                memberCount.textContent = `${d.data().members?.length || 0} חניכים`;
                 info.appendChild(h3);
+                info.appendChild(memberCount);
                 const deleteBtn = document.createElement('button');
                 deleteBtn.className = 'icon-btn';
                 deleteBtn.title = 'מחק קבוצה';
@@ -1205,7 +1795,7 @@
         // =====================================================
         async function loadSessions() {
             const list = document.getElementById('instructor-sessions-list');
-            list.textContent = "טוען...";
+            list.innerHTML = '<div class="loading-text">טוען...</div>';
             const snaps = await getDocs(query(collection(db, "groups", state.curGroupId, "sessions"), orderBy("sessionNumber", state.sessionSort)));
             state.allSessionsCache = snaps.docs.map(d => ({ id: d.id, ...d.data() }));
             list.innerHTML = '';
@@ -1575,7 +2165,7 @@
             const uids = gDoc.data().members || [];
             state.membersCache = [];
             list.innerHTML = '';
-            if (uids.length === 0) { list.textContent = "אין חניכים בקבוצה"; return; }
+            if (uids.length === 0) { list.innerHTML = '<div class="empty-state"><span class="empty-icon">👥</span><p>אין חניכים בקבוצה עדיין</p></div>'; return; }
 
             // Batch fetch — avoids N+1 queries
             const usersMap = await fetchUsersByUids(uids);
@@ -1717,7 +2307,7 @@
         // =====================================================
         async function loadNotices() {
             const list = document.getElementById('instructor-notices-list');
-            list.textContent = "טוען...";
+            list.innerHTML = '<div class="loading-text">טוען...</div>';
             const snaps = await getDocs(query(collection(db, "groups", state.curGroupId, "notices"), orderBy("createdAt", "desc")));
             list.innerHTML = '';
             snaps.forEach(d => {
@@ -1725,17 +2315,16 @@
                 const dateStr = n.createdAt ? n.createdAt.toDate().toLocaleDateString('he-IL') : '';
                 const reads = n.readBy ? n.readBy.length : 0;
                 const card = document.createElement('div');
-                card.className = 'card';
-                card.style.cssText = 'padding:15px;margin-bottom:10px;';
+                card.className = 'notice-card';
                 const p = document.createElement('p');
-                p.style.marginBottom = '8px';
+                p.className = 'notice-text';
                 p.textContent = n.text; // safe textContent
                 const meta = document.createElement('div');
-                meta.style.cssText = 'display:flex;justify-content:space-between;font-size:0.85rem;color:var(--muted-gray);';
+                meta.className = 'notice-meta';
                 const dateSpan = document.createElement('span');
-                dateSpan.textContent = dateStr;
+                dateSpan.textContent = `📅 ${dateStr}`;
                 const readsSpan = document.createElement('span');
-                readsSpan.textContent = `נקרא ע"י: ${reads} חניכים`;
+                readsSpan.textContent = `👁 ${reads} קריאות`;
                 meta.appendChild(dateSpan);
                 meta.appendChild(readsSpan);
                 card.appendChild(p);
@@ -1761,10 +2350,10 @@
             const cont = document.getElementById('student-groups-container');
             const statsCont = document.getElementById('student-stats-container');
             alerts.innerHTML = '';
-            cont.textContent = "טוען...";
+            cont.innerHTML = '<div class="loading-text">טוען...</div>';
 
             const snaps = await getDocs(query(collection(db, "groups"), where("members", "array-contains", auth.currentUser.uid)));
-            cont.innerHTML = snaps.empty ? "לא רשום לקורסים" : "";
+            cont.innerHTML = snaps.empty ? '<div class="empty-state"><span class="empty-icon">📚</span><p>לא רשום לקורסים כרגע</p></div>' : "";
 
             let totalSessions = 0, totalPresent = 0, totalLateMins = 0, totalLatesCount = 0, totalAbsences = 0;
 
@@ -1854,8 +2443,9 @@
                 card.appendChild(info);
                 card.appendChild(pendingBtn);
             } else {
-                card.className = 'card bg-blink-warn';
+                card.className = 'card session-alert-card bg-blink-warn';
                 const btn = document.createElement('button');
+                btn.className = 'attend-btn';
                 btn.textContent = 'דווח נוכחות 📍';
                 const iLat = session.instructorLocation?.lat;
                 const iLng = session.instructorLocation?.lng;
@@ -1888,17 +2478,35 @@
 
                 const card = document.createElement('div');
                 card.className = 'card';
-                card.style.borderTop = `4px solid ${color}`;
+                card.style.cssText = `border-top: 4px solid ${color}; padding: 24px;`;
                 card.innerHTML = `
-                    <h3 style="margin-bottom:5px;">סטטיסטיקת נוכחות אישית</h3>
-                    <p style="font-size:1.5rem;font-weight:bold;color:${color};">${pct}% <span style="font-size:1rem;font-weight:normal;color:var(--dark-blue);">(${totalPresent}/${totalSessions} מפגשים)</span></p>
-                    <div style="display:flex;justify-content:space-around;margin-top:15px;padding-top:15px;border-top:1px solid var(--border-color);font-size:0.95rem;font-weight:500;">
-                        <span style="color:var(--success-green);">✅ נוכחות: ${totalPresent}</span>
-                        <span style="color:var(--warning-orange);">⏰ איחורים: ${totalLatesCount}</span>
-                        <span style="color:var(--danger-red);">❌ חיסורים: ${totalAbsences}</span>
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+                        <div>
+                            <p style="font-size:0.78rem;font-weight:700;color:var(--muted-gray);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:4px;">נוכחות כוללת</p>
+                            <p style="font-family:'Syne',sans-serif;font-size:2.4rem;font-weight:800;color:${color};line-height:1;">${pct}%</p>
+                            <p style="font-size:0.85rem;color:var(--muted-gray);margin-top:2px;">${totalPresent} מתוך ${totalSessions} מפגשים</p>
+                        </div>
+                        <div style="width:52px;height:52px;border-radius:50%;background:${color}1a;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;">${pct >= 80 ? '🏆' : pct >= 50 ? '📈' : '⚠️'}</div>
                     </div>
-                    ${totalLateMins > 0 ? `<p style="color:var(--warning-orange);font-size:0.9rem;margin-top:10px;text-align:center;">סה"כ זמן איחורים מצטבר: <strong>${totalLateMins} דקות</strong></p>` : ''}
-                    <p style="margin-top:15px;font-size:0.95rem;font-weight:500;text-align:center;background:#f8fafc;padding:10px;border-radius:8px;">💡 ${msg}</p>
+                    <div style="height:8px;background:#eef0f4;border-radius:99px;overflow:hidden;margin-bottom:18px;">
+                        <div style="height:100%;width:${pct}%;background:${color};border-radius:99px;transition:width 0.8s ease;"></div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:${totalLateMins > 0 ? '14px' : '0'};">
+                        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:10px;text-align:center;">
+                            <p style="font-size:1.3rem;font-weight:800;color:var(--success-green);font-family:'Syne',sans-serif;">${totalPresent}</p>
+                            <p style="font-size:0.72rem;color:#15803d;font-weight:600;">נוכחויות</p>
+                        </div>
+                        <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:10px;text-align:center;">
+                            <p style="font-size:1.3rem;font-weight:800;color:var(--warning-orange);font-family:'Syne',sans-serif;">${totalLatesCount}</p>
+                            <p style="font-size:0.72rem;color:#b45309;font-weight:600;">איחורים</p>
+                        </div>
+                        <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:10px;text-align:center;">
+                            <p style="font-size:1.3rem;font-weight:800;color:var(--danger-red);font-family:'Syne',sans-serif;">${totalAbsences}</p>
+                            <p style="font-size:0.72rem;color:#b91c1c;font-weight:600;">חיסורים</p>
+                        </div>
+                    </div>
+                    ${totalLateMins > 0 ? `<p style="color:var(--warning-orange);font-size:0.85rem;text-align:center;margin-bottom:14px;">סה"כ זמן איחורים: <strong>${totalLateMins} דקות</strong></p>` : ''}
+                    <div style="background:${color}0f;border:1px solid ${color}30;border-radius:10px;padding:12px 16px;font-size:0.88rem;font-weight:600;color:${color};text-align:center;">${msg}</div>
                 `;
                 statsCont.innerHTML = '';
                 statsCont.appendChild(card);
@@ -1919,9 +2527,9 @@
             document.getElementById('student-group-details').classList.remove('hidden');
             safeText(document.getElementById('student-group-name-header'), name);
             const list = document.getElementById('student-history-list');
-            list.textContent = "טוען...";
+            list.innerHTML = '<div class="loading-text">טוען...</div>';
             const snaps = await getDocs(query(collection(db, "groups", gid, "sessions"), orderBy("sessionNumber", "desc")));
-            list.innerHTML = snaps.empty ? "אין מפגשים" : "";
+            list.innerHTML = snaps.empty ? '<div class="empty-state"><span class="empty-icon">📅</span><p>אין מפגשים עדיין</p></div>' : "";
             snaps.forEach(sd => {
                 const s = sd.data();
                 const att = s.attendance?.[auth.currentUser.uid];
