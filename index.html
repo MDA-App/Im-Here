@@ -655,13 +655,23 @@
         // =====================================================
         // SPLASH SCREEN
         // =====================================================
+        let splashHidden = false;
         function hideSplashScreen() {
+            if (splashHidden) return;
+            splashHidden = true;
             const splash = document.getElementById('splash-screen');
             if (splash) {
                 splash.style.opacity = '0';
                 setTimeout(() => splash.classList.add('hidden'), 500);
             }
         }
+        // Fallback: hide splash after 8 seconds even if Firebase/auth hangs
+        setTimeout(() => {
+            if (!splashHidden) {
+                hideSplashScreen();
+                showView('view-auth');
+            }
+        }, 8000);
 
         // =====================================================
         // FIX 6: Debounce helper — prevents rapid repeated calls (e.g. register button spam).
@@ -1320,7 +1330,10 @@
                         status: 'open', attendance: {}, exceptions: {}, createdAt: serverTimestamp(),
                         instructorLocation: { lat: pos.coords.latitude, lng: pos.coords.longitude }
                     });
+                    btn.disabled = false;
+                    btn.textContent = "הפעל ודגום מיקום 📍";
                     closeModals();
+                    showToast('מפגש נפתח בהצלחה! המיקום נדגם ✅', 'success');
                     loadSessions();
                 },
                 async (geoError) => {
@@ -1331,26 +1344,17 @@
                         // Give the user clear reset instructions AND the option to open without GPS.
                         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
                         const resetSteps = isIOS
-                            ? 'כיצד לאפס:
-הגדרות ← פרטיות ← שירותי מיקום ← Safari ← "בעת השימוש"
-לאחר מכן רענן את הדף ונסה שוב.'
-                            : 'כיצד לאפס (Chrome):
-לחץ על 🔒 בשורת הכתובת ← הגדרות האתר ← מיקום ← אפשר.
-לאחר מכן רענן את הדף ונסה שוב.
-
-אם לא מצליח — השתמש בכפתור "פתח ללא GPS".';
+                            ? 'כיצד לאפס:\nהגדרות ← פרטיות ← שירותי מיקום ← Safari ← "בעת השימוש"\nלאחר מכן רענן את הדף ונסה שוב.'
+                            : 'כיצד לאפס (Chrome):\nלחץ על 🔒 בשורת הכתובת ← הגדרות האתר ← מיקום ← אפשר.\nלאחר מכן רענן את הדף ונסה שוב.\n\nאם לא מצליח — השתמש בכפתור "פתח ללא GPS".';
                         await appDialog({
                             title: '🔒 הרשאת מיקום נדחתה',
-                            message: 'הדפדפן חסם גישה למיקום (ייתכן שנדחה בעבר).
-
-' + resetSteps,
+                            message: 'הדפדפן חסם גישה למיקום (ייתכן שנדחה בעבר).\n\n' + resetSteps,
                             confirmText: 'הבנתי'
                         });
                     } else {
                         await appDialog({
                             title: 'שגיאת GPS',
-                            message: 'לא ניתן לקבל מיקום. ודא שה-GPS דלוק ושהאתר מאושר לגישה למיקום.
-אם הבעיה נמשכת — השתמש בכפתור "פתח ללא GPS".',
+                            message: 'לא ניתן לקבל מיקום. ודא שה-GPS דלוק ושהאתר מאושר לגישה למיקום.\nאם הבעיה נמשכת — השתמש בכפתור "פתח ללא GPS".',
                             confirmText: 'סגור'
                         });
                     }
