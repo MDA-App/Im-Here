@@ -1476,7 +1476,77 @@
             if (id === 'view-instructor') document.getElementById('instructor-main').classList.remove('hidden');
             if (id === 'view-student') document.getElementById('student-main-dashboard').classList.remove('hidden');
         }
+        
+        // פונקציה לטעינת הודעות מהמסד נתונים
+async function loadMessages() {
+    const container = document.getElementById('messages-container');
+    showView('view-messages'); // מעבר למסך ההודעות
+    
+    container.innerHTML = '<p class="loading-text">טוען הודעות...</p>';
 
+    try {
+        // שליפת הודעות שמיועדות לתפקיד של המשתמש הנוכחי
+        const q = db.collection('messages')
+            .where('recipientRole', '==', state.userRole)
+            .orderBy('timestamp', 'desc');
+
+        const snapshot = await q.get();
+        
+        if (snapshot.empty) {
+            container.innerHTML = '<div class="empty-state"><span class="empty-icon">📂</span><p>אין הודעות חדשות</p></div>';
+            return;
+        }
+
+        let html = '';
+        snapshot.forEach(doc => {
+            const msg = doc.data();
+            const date = msg.timestamp ? new Date(msg.timestamp.seconds * 1000).toLocaleString('he-IL') : 'תאריך לא ידוע';
+            
+            html += `
+                <div class="list-item" style="flex-direction: column; align-items: flex-start; gap: 8px;">
+                    <div style="display: flex; justify-content: space-between; width: 100%; border-bottom: 1px solid var(--border-subtle); padding-bottom: 5px;">
+                        <span style="font-weight: bold; color: var(--dark-blue);">${msg.senderName || 'חניך/ה'}</span>
+                        <span class="small-date">${date}</span>
+                    </div>
+                    <p style="font-size: 0.95rem; line-height: 1.5;">${msg.text}</p>
+                    <div style="display: flex; justify-content: space-between; width: 100%; margin-top: 5px;">
+                        <span class="status-tag bg-blue" style="font-size: 0.7rem;">${msg.courseName || 'כללי'}</span>
+                        <button onclick="deleteMessage('${doc.id}')" class="icon-btn" style="border:none; color: var(--danger-red);">
+                            <i class="fas fa-trash"></i> מחק
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+
+    } catch (error) {
+        console.error("Error:", error);
+        showToast('שגיאה בטעינת הודעות', 'error');
+        container.innerHTML = '<p class="text-red">לא ניתן לטעון הודעות כרגע. וודא שיש לך הרשאות מתאימות.</p>';
+    }
+}
+
+// פונקציית עזר לחזרה למסך הנכון
+function goBackToRoleDashboard() {
+    if (state.userRole === 'admin') showView('view-admin');
+    else if (state.userRole === 'instructor') showView('view-instructor');
+    else showView('view-student');
+}
+
+// פונקציה למחיקת הודעה שנקראה
+async function deleteMessage(id) {
+    if(!confirm('למחוק את ההודעה?')) return;
+    try {
+        await db.collection('messages').doc(id).delete();
+        showToast('ההודעה נמחקה');
+        loadMessages(); // ריענון הרשימה
+    } catch (e) {
+        showToast('שגיאה במחיקה', 'error');
+    }
+}
+
+    
         // =====================================================
         // UTILITY: isAdmin check (role only, NOT email)
         // =====================================================
