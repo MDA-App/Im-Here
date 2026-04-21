@@ -932,7 +932,18 @@
                 <button id="btn-update-password">אשר סיסמה חדשה</button>
             </div>
         </section>
-
+<section id="view-messages" class="card hidden">
+    <div class="action-row">
+        <button class="outline action-btn-small" onclick="goBackToRoleDashboard()">🔙 חזור</button>
+    </div>
+    <h2 style="margin-top:15px;">
+        <i class="fas fa-inbox" style="color: var(--info-blue); margin-left: 8px;"></i>
+        תיבת הודעות
+    </h2>
+    <div id="messages-container" style="margin-top:20px;">
+        </div>
+</section>
+        
         <!-- ADMIN -->
         <section id="view-admin" class="card hidden">
             <h2>מערכת ניהול</h2>
@@ -1477,15 +1488,16 @@
             if (id === 'view-student') document.getElementById('student-main-dashboard').classList.remove('hidden');
         }
         
-        // פונקציה לטעינת הודעות מהמסד נתונים
+        // פונקציות לניהול תיבת הודעות
 async function loadMessages() {
     const container = document.getElementById('messages-container');
-    showView('view-messages'); // מעבר למסך ההודעות
+    if (!container) return;
     
-    container.innerHTML = '<p class="loading-text">טוען הודעות...</p>';
+    showView('view-messages');
+    container.innerHTML = '<p class="loading-text" style="text-align:center; padding:20px;">טוען הודעות...</p>';
 
     try {
-        // שליפת הודעות שמיועדות לתפקיד של המשתמש הנוכחי
+        // שליפה לפי התפקיד של מי שמחובר כרגע
         const q = db.collection('messages')
             .where('recipientRole', '==', state.userRole)
             .orderBy('timestamp', 'desc');
@@ -1493,7 +1505,11 @@ async function loadMessages() {
         const snapshot = await q.get();
         
         if (snapshot.empty) {
-            container.innerHTML = '<div class="empty-state"><span class="empty-icon">📂</span><p>אין הודעות חדשות</p></div>';
+            container.innerHTML = `
+                <div style="text-align:center; padding:40px; color:#999;">
+                    <i class="fas fa-envelope-open" style="font-size:3rem; display:block; margin-bottom:10px;"></i>
+                    <p>אין הודעות חדשות עבורך</p>
+                </div>`;
             return;
         }
 
@@ -1503,48 +1519,49 @@ async function loadMessages() {
             const date = msg.timestamp ? new Date(msg.timestamp.seconds * 1000).toLocaleString('he-IL') : 'תאריך לא ידוע';
             
             html += `
-                <div class="list-item" style="flex-direction: column; align-items: flex-start; gap: 8px;">
-                    <div style="display: flex; justify-content: space-between; width: 100%; border-bottom: 1px solid var(--border-subtle); padding-bottom: 5px;">
-                        <span style="font-weight: bold; color: var(--dark-blue);">${msg.senderName || 'חניך/ה'}</span>
-                        <span class="small-date">${date}</span>
+                <div class="list-item" style="flex-direction: column; align-items: flex-start; gap: 8px; border:1px solid #eee; padding:15px; margin-bottom:10px; border-radius:12px; background:#f9f9f9;">
+                    <div style="display: flex; justify-content: space-between; width: 100%; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+                        <strong style="color:var(--dark-blue);">${msg.senderName || 'חניך/ה'}</strong>
+                        <span style="font-size: 0.8rem; color: #888;">${date}</span>
                     </div>
-                    <p style="font-size: 0.95rem; line-height: 1.5;">${msg.text}</p>
-                    <div style="display: flex; justify-content: space-between; width: 100%; margin-top: 5px;">
+                    <p style="margin: 10px 0; line-height:1.4;">${msg.text}</p>
+                    <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
                         <span class="status-tag bg-blue" style="font-size: 0.7rem;">${msg.courseName || 'כללי'}</span>
-                        <button onclick="deleteMessage('${doc.id}')" class="icon-btn" style="border:none; color: var(--danger-red);">
-                            <i class="fas fa-trash"></i> מחק
+                        <button onclick="deleteMessage('${doc.id}')" style="color: var(--primary-red); background: none; border: none; cursor: pointer; font-size:0.9rem;">
+                            <i class="fas fa-trash-alt"></i> מחק
                         </button>
                     </div>
-                </div>
-            `;
+                </div>`;
         });
         container.innerHTML = html;
-
     } catch (error) {
-        console.error("Error:", error);
-        showToast('שגיאה בטעינת הודעות', 'error');
-        container.innerHTML = '<p class="text-red">לא ניתן לטעון הודעות כרגע. וודא שיש לך הרשאות מתאימות.</p>';
+        console.error("שגיאה בטעינת הודעות:", error);
+        showToast('שגיאה בגישה לבסיס הנתונים', 'error');
     }
 }
 
-// פונקציית עזר לחזרה למסך הנכון
 function goBackToRoleDashboard() {
     if (state.userRole === 'admin') showView('view-admin');
     else if (state.userRole === 'instructor') showView('view-instructor');
     else showView('view-student');
 }
 
-// פונקציה למחיקת הודעה שנקראה
 async function deleteMessage(id) {
-    if(!confirm('למחוק את ההודעה?')) return;
+    if(!confirm('למחוק את ההודעה לצמיתות?')) return;
     try {
         await db.collection('messages').doc(id).delete();
-        showToast('ההודעה נמחקה');
-        loadMessages(); // ריענון הרשימה
+        showToast('הודעה נמחקה');
+        loadMessages();
     } catch (e) {
         showToast('שגיאה במחיקה', 'error');
     }
 }
+
+// חשיפת הפונקציות לעולם החיצוני (קריטי!)
+window.loadMessages = loadMessages;
+window.goBackToRoleDashboard = goBackToRoleDashboard;
+window.deleteMessage = deleteMessage;
+
 
     
         // =====================================================
