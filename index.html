@@ -941,6 +941,7 @@
                 <div class="tab" data-admin-tab="groups">ניהול קבוצות</div>
                 <div class="tab" data-admin-tab="dashboard">סקירה מערכתית</div>
                 <div class="tab" data-admin-tab="messages">📬 הודעות</div>
+                <div class="tab" onclick="loadMessages()">הודעות מערכת</div>
                 <div class="tab" data-admin-tab="broadcasts">הודעות מערכת</div>
                 <div class="tab" data-admin-tab="log">לוג עריכות</div>
             </div>
@@ -988,6 +989,10 @@
                     <button class="secondary" id="btn-instructor-create-group" style="margin-bottom:20px;">➕ יצירת קבוצה חדשה</button>
                     <div id="instructor-groups-container"></div>
                 </div>
+                <button class="outline" onclick="loadMessages()" style="margin-bottom:20px; border-color: var(--info-blue); color: var(--info-blue);">
+    📩 צפה בהודעות מחניכים
+                </button>
+                
             </div>
             <div id="instructor-group-details" class="hidden">
                 <div class="card">
@@ -1066,6 +1071,19 @@
                 </div>
             </div>
         </section>
+        <section id="view-messages" class="card hidden">
+    <div class="action-row">
+        <button class="outline action-btn-small" onclick="goBackToRoleDashboard()">🔙 חזור</button>
+    </div>
+    <h2>
+        <i class="fas fa-envelope-open-text" style="color: var(--primary-red); margin-left: 8px;"></i>
+        תיבת הודעות
+    </h2>
+    <div id="messages-container" class="space-y-4">
+        <p class="loading-text">טוען הודעות...</p>
+    </div>
+</section>
+
     </main>
 
     <!-- MODALS -->
