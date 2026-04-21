@@ -1105,7 +1105,7 @@
             <h3>יצירת מפגש חדש</h3>
             <label style="font-weight:500;font-size:0.9rem;margin-bottom:4px;display:block;">מספר מפגש:</label>
             <input type="number" id="ns-num">
-            <label style="font-weight:500;font-size:0.9rem;margin-bottom:4px;display:block;">שעת התחלה (חובה):</label>
+            <label style="font-weight:500;font-size:0.9rem;margin-bottom:4px;display:block;">שעת התחלה (לרישום איחור):</label>
             <input type="time" id="ns-start">
             <label style="font-weight:500;font-size:0.9rem;margin-bottom:4px;display:block;">שעת סיום (אופציונלי):</label>
             <input type="time" id="ns-end">
@@ -1332,6 +1332,8 @@
                 <button type="button" class="es-radius-preset outline action-btn-small" data-val="50">50מ׳</button>
                 <button type="button" class="es-radius-preset outline action-btn-small" data-val="150">150מ׳</button>
                 <button type="button" class="es-radius-preset outline action-btn-small" data-val="300">300מ׳</button>
+                <button id="btn-bypass-gps" class="action-btn-small bg-purple">🚀 שחרר</button>
+          
             </div>
             <button id="btn-resample-location" class="secondary" style="margin-bottom:10px;">📍 דגום מיקום מחדש</button>
             <p id="es-location-status" style="font-size:0.82rem;color:var(--muted-gray);margin-bottom:14px;text-align:center;"></p>
