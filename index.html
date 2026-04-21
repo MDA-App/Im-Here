@@ -2566,11 +2566,21 @@
         }
 
         async function approveNotice(gid, nid, btnEl) {
-            btnEl.disabled = true;
-            btnEl.textContent = "מאשר...";
-            await updateDoc(doc(db, "groups", gid, "notices", nid), { readBy: arrayUnion(auth.currentUser.uid) });
-            loadStudentMain();
-        }
+    btnEl.disabled = true;
+    const originalText = btnEl.textContent;
+    btnEl.textContent = "מאשר...";
+    
+    try {
+        await updateDoc(doc(db, "groups", gid, "notices", nid), { readBy: arrayUnion(auth.currentUser.uid) });
+        await loadStudentMain();
+    } catch (error) {
+        console.error("Error approving notice:", error);
+        btnEl.disabled = false;
+        btnEl.textContent = originalText;
+        showToast("אירעה שגיאה באישור ההודעה", "error");
+    }
+}
+
 
         async function openStudentGroup(gid, name) {
             document.getElementById('student-main-dashboard').classList.add('hidden');
