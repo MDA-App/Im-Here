@@ -2748,14 +2748,26 @@
         }
 
         async function sendExceptionRequest(gid, sid, distCalculated) {
-            document.getElementById('btn-send-exception').textContent = "שולח...";
-            await updateDoc(doc(db, "groups", gid, "sessions", sid), {
-                [`exceptions.${auth.currentUser.uid}`]: { status: 'pending', type: 'manual_request', distance: distCalculated, timestamp: serverTimestamp(), viewed: false }
-            });
-            closeModals();
-            showToast('בקשה חריגה נשלחה למדריך ✋', 'success');
-            loadStudentMain();
-        }
+    const btn = document.getElementById('btn-send-exception');
+    btn.disabled = true; 
+    btn.textContent = "שולח...";
+    
+    try {
+        await updateDoc(doc(db, "groups", gid, "sessions", sid), {
+            [`exceptions.${auth.currentUser.uid}`]: { status: 'pending', type: 'manual_request', distance: distCalculated, timestamp: serverTimestamp(), viewed: false }
+        });
+        closeModals();
+        showToast('בקשה חריגה נשלחה למדריך ✋', 'success');
+        await loadStudentMain();
+    } catch (error) {
+        console.error("Error sending exception:", error);
+        showToast("אירעה שגיאה בשליחת הבקשה", "error");
+    } finally {
+        // איפוס מצב הכפתור למקרה שהמודאל ייפתח שוב בעתיד
+        btn.disabled = false;
+        btn.textContent = "שלח בקשה חריגה למדריך ✋";
+    }
+}
 
         // =====================================================
         // PWA INSTALL
