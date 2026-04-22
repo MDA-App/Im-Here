@@ -351,13 +351,9 @@
         .radius-preset { flex: 1; font-size: 0.8rem !important; padding: 7px 3px !important; text-align: center; }
         .radius-preset.active-preset, .es-radius-preset.active-preset { background: var(--ink-2) !important; color: white !important; border-color: var(--ink-2) !important; }
         /* SPLASH */
-        #splash-screen { background: var(--red) !important; }
-        #splash-screen h1 { font-family: 'Syne', sans-serif !important; font-size: 2.5rem !important; font-weight: 800 !important; color: (--blue) !important; -webkit-text-fill-color: #ffffff !important; letter-spacing: -1px !important; margin-bottom: 6px !important; }
-        #splash-screen p { color: rgba(255,255,255,0.45) !important; font-size: 0.82rem !important; letter-spacing: 1.5px !important; text-transform: uppercase !important; }
-        @keyframes splashPulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.9; } }
-        #splash-logo { animation: splashPulse 2.4s ease-in-out infinite; }
-        @keyframes splashDividerGrow { from { width: 0; opacity: 0; } to { width: 56px; opacity: 1; } }
-        #splash-divider { width: 56px; height: 2px; background: linear-gradient(90deg, transparent, var(--red), transparent); margin: 12px 0 16px; animation: splashDividerGrow 0.8s ease 0.3s both; }
+        #splash-screen { background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%) !important; }
+        #splash-screen h1 { font-family: 'Syne', sans-serif !important; font-size: 2.5rem !important; font-weight: 800 !important; color: #ffffff !important; letter-spacing: -1px !important; margin-bottom: 6px !important; }
+        #splash-screen p { color: rgba(255,255,255,0.7) !important; font-size: 0.82rem !important; letter-spacing: 1.5px !important; text-transform: uppercase !important; }
         /* FAB */
         #fab-install { background: linear-gradient(135deg, var(--red), var(--red-dark)) !important; border-radius: 18px !important; padding: 14px 20px !important; box-shadow: 0 8px 28px rgba(220,38,38,0.38) !important; font-size: 0.86rem !important; line-height: 1.45 !important; text-align: right !important; }
         /* AUTH */
