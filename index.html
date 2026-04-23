@@ -3477,46 +3477,7 @@
             }
 
             // For instructor messages, find the group hint
-            if (recipType === 'instructor' && toUid) {
-                const gSnap = await getDocs(query(collection(db, "groups"), where("instructorId", "==", toUid)));
-                if (!gSnap.empty) groupIdHint = gSnap.docs[0].data().name;
-            }
-
-            const msgData = {
-                fromUid: auth.currentUser.uid,
-                fromName: state.userData.fullName,
-                fromRole: state.userData.role,
-                toUid, toName,
-                subject: recipType,
-                text,
-                groupHint: groupIdHint,
-                createdAt: serverTimestamp(),
-                readByRecipient: false,
-                reply: null,
-                repliedAt: null,
-                confirmedByUser: false
-            };
-
-            await addDoc(collection(db, "userMessages"), msgData);
-
-            // If sent to instructor, also send a copy to admin with a note
-            if (recipType === 'instructor') {
-                // Also send copy to support/admin
-                await addDoc(collection(db, "userMessages"), {
-                    ...msgData,
-                    toUid: 'support',
-                    toName: 'תמיכה',
-                    subject: 'admin_copy',
-                    adminNote: `עותק: הודעה שנשלחה למדריך ${toName}`,
-                    readByRecipient: false, reply: null, confirmedByUser: false
-                });
-            }
-
-            btn.disabled = false; btn.textContent = 'שלח הודעה ✉️';
-            closeModals();
-            showToast('ההודעה נשלחה בהצלחה ✉️', 'success');
-            writeLog('edit', `שליחת הודעה מ-${state.userData.fullName} אל ${toName} (${recipType})`);
-        }
+            sendContactMessage
 
         // ── INSTRUCTOR INBOX ──────────────────────────────────────────
         async function loadInstructorInbox() {
