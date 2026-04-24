@@ -3693,7 +3693,6 @@
             btn.disabled = true; btn.textContent = 'שולח...';
 
             let toUid = null, toName = '';
-            let groupIdHint = null;
 
             if (recipType === 'instructor') {
                 toUid = document.getElementById('contact-instructor-id').value;
@@ -3706,47 +3705,29 @@
                 toName = 'תמיכה';
             }
 
-            // For instructor messages, find the group hint
-            if (recipType === 'instructor' && toUid) {
-                const gSnap = await getDocs(query(collection(db, "groups"), where("instructorId", "==", toUid)));
-                if (!gSnap.empty) groupIdHint = gSnap.docs[0].data().name;
-            }
-
-            const msgData = {
-                fromUid: auth.currentUser.uid,
-                fromName: state.userData.fullName,
-                fromRole: state.userData.role,
-                toUid, toName,
-                subject: recipType,
-                text,
-                groupHint: groupIdHint,
-                createdAt: serverTimestamp(),
-                readByRecipient: false,
-                reply: null,
-                repliedAt: null,
-                confirmedByUser: false
-            };
-
-            await addDoc(collection(db, "userMessages"), msgData);
-
-            // If sent to instructor, also send a copy to admin with a note
-            if (recipType === 'instructor') {
-                // Also send copy to support/admin
+            try {
                 await addDoc(collection(db, "userMessages"), {
-                    ...msgData,
-                    toUid: 'support',
-                    toName: 'תמיכה',
-                    subject: 'admin_copy',
-                    adminNote: `עותק: הודעה שנשלחה למדריך ${toName}`,
-                    readByRecipient: false, reply: null, confirmedByUser: false
+                    fromUid: auth.currentUser.uid,
+                    fromName: state.userData.fullName || 'משתמש',
+                    fromRole: state.userData?.role || 'student',
+                    toUid: toUid,
+                    toName: toName,
+                    text: text,
+                    createdAt: serverTimestamp(),
+                    readByRecipient: false,
+                    confirmedByUser: false
                 });
+                closeModals();
+                showToast('ההודעה נשלחה בהצלחה! ✉️', 'success');
+            } catch (error) {
+                console.error("Error sending message:", error);
+                showToast("שגיאה בשליחת ההודעה", "error");
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'שלח הודעה ✉️';
             }
+        } 
 
-            btn.disabled = false; btn.textContent = 'שלח הודעה ✉️';
-            closeModals();
-            showToast('ההודעה נשלחה בהצלחה ✉️', 'success');
-            writeLog('edit', `שליחת הודעה מ-${state.userData.fullName} אל ${toName} (${recipType})`);
-        }
 
         // ── INSTRUCTOR INBOX ──────────────────────────────────────────
         async function loadInstructorInbox() {
