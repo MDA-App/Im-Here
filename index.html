@@ -3634,55 +3634,63 @@
         // =====================================================
 
         async function openContactCompose() {
-            const role = state.userData?.role;
-            const recip = document.getElementById('contact-recipient');
-            document.getElementById('contact-text').value = '';
-            // Open modal immediately so user sees something
-            document.getElementById('contact-compose-modal').classList.remove('hidden');
-            try {
-                if (role === 'instructor' || role === 'admin') {
-                    // Instructors and admins only contact support
-                    recip.innerHTML = '<option value="support">תמיכה</option>';
-                    document.getElementById('contact-instructor-select-wrap').classList.add('hidden');
-                } else {
-                    // Students: populate instructors from their groups
-                    recip.innerHTML = '<option value="instructor">המדריך שלי</option><option value="support">תמיכה</option>';
-                    const instrSel = document.getElementById('contact-instructor-id');
-                    instrSel.innerHTML = '<option value="">טוען מדריכים...</option>';
-                    const gSnaps = await getDocs(query(collection(db, "groups"), where("members", "array-contains", auth.currentUser.uid)));
-                    instrSel.innerHTML = '';
-                    const seen = new Set();
-                    for (const gd of gSnaps.docs) {
-                        const g = gd.data();
-                        const iids = [g.instructorId, ...(g.coInstructors||[])].filter(Boolean);
-                        for (const iid of iids) {
-                            if (seen.has(iid)) continue;
-                            seen.add(iid);
-                            const uDoc = await getDoc(doc(db, "users", iid));
-                            if (uDoc.exists()) {
-                                const opt = document.createElement('option');
-                                opt.value = iid;
-                                opt.textContent = uDoc.data().fullName;
-                                instrSel.appendChild(opt);
-                            }
+    const role = state.userData?.role;
+    const recip = document.getElementById('contact-recipient');
+    document.getElementById('contact-text').value = '';
+    // Open modal immediately so user sees something
+    document.getElementById('contact-compose-modal').classList.remove('hidden');
+    try {
+        if (role === 'instructor' || role === 'admin') {
+            // Instructors and admins only contact support
+            recip.innerHTML = '<option value="support">תמיכה</option>';
+            document.getElementById('contact-instructor-select-wrap').classList.add('hidden');
+        } else {
+            // Students: populate instructors from their groups
+            recip.innerHTML = '<option value="instructor">המדריך שלי</option><option value="support">תמיכה</option>';
+            const instrSel = document.getElementById('contact-instructor-id');
+            instrSel.innerHTML = '<option value="">טוען מדריכים...</option>';
+            const gSnaps = await getDocs(query(collection(db, "groups"), where("members", "array-contains", auth.currentUser.uid)));
+            instrSel.innerHTML = '';
+            const seen = new Set();
+            for (const gd of gSnaps.docs) {
+                const g = gd.data();
+                const groupName = g.name; // שומרים את שם הקבוצה כגיבוי
+                const iids = [g.instructorId, ...(g.coInstructors||[])].filter(Boolean);
+                
+                for (const iid of iids) {
+                    if (seen.has(iid)) continue;
+                    seen.add(iid);
+                    
+                    let instructorName = `מדריך (קבוצת ${groupName})`; // שם ברירת מחדל
+                    
+                    try {
+                        const uDoc = await getDoc(doc(db, "users", iid));
+                        if (uDoc.exists() && uDoc.data().fullName) {
+                            instructorName = `${uDoc.data().fullName} (${groupName})`;
                         }
+                    } catch (permErr) {
+                        // אם יש שגיאת הרשאות, נשתמש בשם הקבוצה במקום לקרוס
+                        console.warn("Could not fetch instructor name, using fallback.", permErr);
                     }
-                    if (instrSel.options.length === 0) {
-                        instrSel.innerHTML = '<option value="">לא נמצאו מדריכים</option>';
-                    }
-                    // Always show instructor select when role=student and instructors were found
-                    const hasInstructors = instrSel.options.length > 0 && instrSel.options[0].value !== '';
-                    document.getElementById('contact-instructor-select-wrap').classList.toggle('hidden', recip.value !== 'instructor');
-                    // Ensure the change listener reflects updates
-                    recip.dispatchEvent(new Event('change'));
+
+                    const opt = document.createElement('option');
+                    opt.value = iid;
+                    opt.textContent = instructorName;
+                    instrSel.appendChild(opt);
                 }
-            } catch(err) {
-                console.warn('openContactCompose error:', err);
-                showToast('שגיאה בטעינת הטופס — ניתן לשלוח לתמיכה', 'warning');
-                recip.innerHTML = '<option value="support">תמיכה</option>';
-                document.getElementById('contact-instructor-select-wrap').classList.add('hidden');
             }
+            if (instrSel.options.length === 0) {
+                instrSel.innerHTML = '<option value="">לא נמצאו מדריכים</option>';
+            }
+            document.getElementById('contact-instructor-select-wrap').classList.toggle('hidden', recip.value !== 'instructor');
         }
+    } catch(err) {
+        console.warn('openContactCompose error:', err);
+        showToast('שגיאה בטעינת הטופס — ניתן לשלוח לתמיכה', 'warning');
+        recip.innerHTML = '<option value="support">תמיכה</option>';
+        document.getElementById('contact-instructor-select-wrap').classList.add('hidden');
+    }
+}
 
         async function sendContactMessage() {
             const text = document.getElementById('contact-text').value.trim();
