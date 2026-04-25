@@ -4476,7 +4476,7 @@ function loadMobileDevMode() {
                     btn.style.color = l === lang ? 'var(--red)' : '';
                 }
             });
-            showToast(lang === 'en' ? 'Language changed to English' : lang === 'ar' ? 'تم تغيير اللغة' : 'ברוך הבא! יוצר חיבור מאובטח 🛡️, 'success');
+            showToast(lang === 'en' ? 'Language changed to English' : lang === 'ar' ? 'تم تغيير اللغة' : 'ברוך הבא! יוצר חיבור מאובטח' 🛡️, 'success');
         }
         applyLang(currentLang);
         document.getElementById('btn-lang-he').addEventListener('click', () => applyLang('he'));
